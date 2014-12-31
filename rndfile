@@ -1,0 +1,127 @@
+#! /usr/bin/python3
+# -*- coding: utf-8 -*-
+
+import fnmatch
+import os
+import os.path
+import random
+import sys
+
+
+def rndFile( directory='.', patterns=[], fullname=False, dots=False ):
+    '''Returns the name of a randomly chosen file in a directory.
+
+Argument "directory" is the directory where the candidate files are
+(default is current). Argument "patterns" is a list of filename
+patterns. The file is chosen among the set of files matching at least
+one of the filename patterns.
+
+If argument "fullname" is False, only the name of the file is returned
+(without the path). Otherwise, the full path is returned.
+
+If argument "dots" is False, dot files are excluded from the choice.
+Otherwise, they are included.
+
+If the directory is empty or no files match, None is returned.
+
+    '''
+
+    if not directory.endswith( '/' ):
+        directory += '/'
+
+    # Throw out dirs:
+    try:
+        files = [f for f in os.listdir( directory ) 
+                 if os.path.isfile( directory + f )]
+    except OSError as err:
+        print( "OS error: {0}".format( err ) )
+        os.sys.exit( 1 )
+
+    # Throw out dot files (depending on option 'dots'):
+    if not dots:
+        files = [f for f in files if not f.startswith( '.' )]
+
+    # Any files left?
+    if files == []:
+        return None
+    
+    # Gather candidate files:
+    if patterns == []:
+        candidates = files
+    else:
+        candidates = []
+        for p in patterns:
+            candidates.extend( fnmatch.filter( files, p ) )
+
+    # Any files left?
+    if candidates == []:
+        return None
+    else:
+        # Yes, there are still candidate files.
+        # There may be duplicates. Eliminate them:
+        candidates = list( set( candidates ) )
+        n = len( candidates )
+        # Choose a file randomly and return its name:
+        if fullname:
+            return directory + candidates[random.randrange( n )]
+        else:
+            return candidates[random.randrange( n )]
+
+
+if __name__ == '__main__':
+
+    # Parse command line arguments:
+    import argparse
+
+    # Description:
+    parser = argparse.ArgumentParser( 
+        description='Returns the name of a randomly chosen file in a directory.'
+    )
+
+    # Option to include full pathnames in result:
+    parser.add_argument( 
+        '-f',
+        '--full', 
+        help='return full pathname of chosen file',
+        action='store_true'
+    )
+
+    # Option to specify pattern(s) to restrict the choice:
+    parser.add_argument(
+        '-p',
+        help='''filename pattern to restrict the choice (you may enter zero or more
+instances of this option, and they will be joined with nonexclusive
+OR)''',
+        action='append',
+        default=[]
+    )
+
+    # Option to include dot files in the choice:
+    parser.add_argument( 
+        '-d',
+        '--dot', 
+        help='include dot (hidden) files',
+        action='store_true'
+    )
+    
+    # Arg specifying the directory to search:
+    parser.add_argument(
+        'directory',
+        help='the directory from which to choose the file (default: current dir)',
+        nargs='?',
+        default='.'
+    )
+
+    # Parse:
+    args = parser.parse_args()
+
+    # Call function and print result:
+    print( 
+        rndFile( 
+            args.directory, 
+            patterns=args.p, 
+            fullname=args.full,
+            dots=args.dot
+        )
+    )
+
