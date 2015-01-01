@@ -18,6 +18,7 @@ Options:
   -f, --full          Return full pathname of selected file.
   -a, --all           Allow selection of dot (hidden) files.
   -p P, --pattern P   Comma separated list of filename pattern(s) 
+                      (e.g., -p '*.gif, *.jpg, *.jpeg, *.png')
                       to restrict the selection (joined with nonexclusive OR).
 
 """
