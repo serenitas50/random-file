@@ -22,7 +22,8 @@ Options:
                       to restrict the selection (joined with nonexclusive OR).
 
 """
-# Version 0.2 
+
+versionStr = 'rndfile v0.2\thttp://github.com/serenitas50/random-file'
 
 import fnmatch
 import os
@@ -96,7 +97,7 @@ if __name__ == '__main__':
 
     arguments = docopt(
         __doc__, 
-        version='rndfile v0.2\thttp://github.com/serenitas50/random-file'
+        version=versionStr
     )
     
     if arguments['DIRECTORY'] is None:
